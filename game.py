@@ -83,6 +83,9 @@ class Game:
                     
         self.screen.blit(pygame.transform.scale(self.display, (self.screen.width, self.screen.height)))
         pygame.display.flip()
+        
+    def resize():
+        pass
     
 Game(800, 600, 3).run()    
     
