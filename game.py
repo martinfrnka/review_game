@@ -11,7 +11,7 @@ class Game:
         self.display = pygame.surface.Surface((int(width//zoom), int(height/zoom)))
         
         self.display_center = (self.display.width//2, self.display.height//2)
-        
+        self.fullscreen = False
         self.timer = pygame.time.Clock()
         self.running = True
         
@@ -31,6 +31,11 @@ class Game:
         self.tilemap = Tilemap(self.assets)
         print('Game initialised!')
         
+    def chage_resolution(self, size=None):
+        if size:
+            self.screen = pygame.display.set_mode(size, pygame.DOUBLEBUF)
+        else: 
+            self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         
     def run(self):
         while self.running:
@@ -54,6 +59,13 @@ class Game:
                     self.player.movement[2] = True
                 if event.key == pygame.K_RIGHT:
                     self.player.movement[3] = True
+                if event.key == pygame.K_r:
+                    self.chage_resolution((320,240))
+                if event.key == pygame.K_e:
+                    self.chage_resolution((640,480))
+                if event.key == pygame.K_f:
+                    self.chage_resolution()
+                    
                 if event.key == pygame.K_SPACE:
                     self.player.jump = True
     
