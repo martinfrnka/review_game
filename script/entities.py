@@ -4,8 +4,9 @@ class PhysicsEntity:
     def __init__(self, image, position):
         self.pos = list(position)
         self.image = image
+        self.center_ofset = (self.image.width//2, self.image.height//2)
         self.movement = list([False, False, False, False])
-        
+
     def update(self):
         pass
     
@@ -16,7 +17,9 @@ class PhysicsEntity:
         
     def get_pos(self):
         return (self.pos[0], self.pos[1])
-        
+
+    def get_center_pos(self):
+        return (self.pos[0]+ self.center_ofset[0], self.pos[1]+self.center_ofset[1])
         
 class Player(PhysicsEntity):
     def __init__(self, image, position=(0, 0), speed=1):
