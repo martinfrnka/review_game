@@ -82,7 +82,13 @@ class Game:
                     self.chage_resolution((640,480))
                 if event.key == pygame.K_f:
                     self.chage_resolution(None)
-                    
+                if event.key == pygame.K_w:
+                    self.zoom_factor +=1
+                    self.chage_resolution(self.screen_size)
+                if event.key == pygame.K_s:
+                    self.zoom_factor -= 1
+                    self.chage_resolution(self.screen_size)
+                        
                 if event.key == pygame.K_SPACE:
                     self.player.jump = True
     
