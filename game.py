@@ -6,14 +6,20 @@ from script.camera import Camera
 class Game:
     def __init__(self, width:int = 1280, height:int = 960, zoom = 2):
         pygame.init()
+        self.screen_size = list((width, height))
+        self.zoom_factor = zoom
+        self.display_center = None
         pygame.display.set_caption('Review game')
-        self.screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
-        self.display = pygame.surface.Surface((int(width//zoom), int(height/zoom)))
-        
-        self.display_center = (self.display.width//2, self.display.height//2)
-        
+        self.display:pygame.display.Surface = None
+        self.fullscreen = False
         self.timer = pygame.time.Clock()
         self.running = True
+
+        self.camera:Camera = None
+
+        self.screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
+        
+
         
         self.assets = {
             'player': (load_image('player.png')),
@@ -26,12 +32,28 @@ class Game:
             
         }
         
-        self.player = Player(self.assets['player'], (105,105), 3)
-        self.camera = Camera((-50,-50), self.display_center)
+        
+        self.player = Player(self.assets['player'], (105,55), 3)
+
+        self.chage_resolution((width, height))
         self.tilemap = Tilemap(self.assets)
         print('Game initialised!')
         
+    def chage_resolution(self, size):
+        if not size:
+            print('go full')
+            self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        else:
+            self.screen = pygame.display.set_mode(size, pygame.DOUBLEBUF)
+
+        self.screen_size = self.screen.get_size()
+        self.display_center = ((self.screen_size[0]/2)/self.zoom_factor, (self.screen_size[1]/2)/self.zoom_factor)
         
+        self.display = pygame.surface.Surface((int(self.screen_size[0]//self.zoom_factor), int(self.screen_size[1]/self.zoom_factor)))
+        
+        self.camera = Camera(self.player.get_center_pos(), self.display_center)
+
+
     def run(self):
         while self.running:
             self.handle_events()
@@ -54,6 +76,19 @@ class Game:
                     self.player.movement[2] = True
                 if event.key == pygame.K_RIGHT:
                     self.player.movement[3] = True
+                if event.key == pygame.K_r:
+                    self.chage_resolution((320,240))
+                if event.key == pygame.K_e:
+                    self.chage_resolution((640,480))
+                if event.key == pygame.K_f:
+                    self.chage_resolution(None)
+                if event.key == pygame.K_w:
+                    self.zoom_factor +=1
+                    self.chage_resolution(self.screen_size)
+                if event.key == pygame.K_s:
+                    self.zoom_factor -= 1
+                    self.chage_resolution(self.screen_size)
+                        
                 if event.key == pygame.K_SPACE:
                     self.player.jump = True
     
@@ -69,7 +104,7 @@ class Game:
     
     def update(self):
         self.player.update()
-        self.camera.update(self.player.get_pos())
+        self.camera.update(self.player.get_center_pos())
        
         self.tilemap.update()
     
@@ -83,6 +118,9 @@ class Game:
                     
         self.screen.blit(pygame.transform.scale(self.display, (self.screen.width, self.screen.height)))
         pygame.display.flip()
+        
+    def resize():
+        pass
     
-Game(800, 600, 3).run()    
+Game(800, 600, 6).run()    
     
