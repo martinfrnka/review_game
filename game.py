@@ -1,5 +1,5 @@
 import pygame
-from script.helpers import load_image, load_images
+from script.helpers import load_image, load_images, load_assets
 from script.entities import Player
 from script.tilemap import Tilemap
 from script.camera import Camera
@@ -19,19 +19,7 @@ class Game:
 
         self.screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
         
-
-        
-        self.assets = {
-            'player': (load_image('player.png')),
-            'decor': load_images('tiles/decor/'),
-            'large_decor': load_images('tiles/large_decor/'),
-            'grass': load_images('tiles/grass/'),
-            'stone': load_images('tiles/stone/'),
-            'spawners': load_images('tiles/spawners/'),
-            'clouds': load_images('clouds/'),
-            
-        }
-        
+        self.assets = load_assets()
         
         self.player = Player(self.assets['player'], (105,55), 3)
 
@@ -91,7 +79,7 @@ class Game:
                         
                 if event.key == pygame.K_SPACE:
                     self.player.jump = True
-    
+ 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
                     self.player.movement[0] = False
