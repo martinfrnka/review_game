@@ -17,30 +17,32 @@ class Game:
 
         self.camera:Camera = None
 
-        self.screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
+        self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         
         self.assets = load_assets()
         
         self.player = Player(self.assets['player'], (105,55), 3)
 
-        self.chage_resolution((width, height))
+        self.change_resolution((width, height))
         self.tilemap = Tilemap(self.assets)
         print('Game initialised!')
         
-    def chage_resolution(self, size):
-        if not size:
-            print('go full')
-            self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-        else:
-            self.screen = pygame.display.set_mode(size, pygame.DOUBLEBUF)
-
+    def change_display_size(self):
         self.screen_size = self.screen.get_size()
         self.display_center = ((self.screen_size[0]/2)/self.zoom_factor, (self.screen_size[1]/2)/self.zoom_factor)
         
         self.display = pygame.surface.Surface((int(self.screen_size[0]//self.zoom_factor), int(self.screen_size[1]/self.zoom_factor)))
         
         self.camera = Camera(self.player.get_center_pos(), self.display_center)
+        
+    def change_resolution(self, size):
+        if not size:
+            print('go full')
+            self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        else:
+            self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
+        self.change_display_size()
 
     def run(self):
         while self.running:
@@ -55,6 +57,9 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 self.running = False
+            if event.type == pygame.VIDEORESIZE:
+                self.change_resolution((event.w, event.h))
+                
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     self.player.movement[0] = True
@@ -65,17 +70,25 @@ class Game:
                 if event.key == pygame.K_RIGHT:
                     self.player.movement[3] = True
                 if event.key == pygame.K_r:
-                    self.chage_resolution((320,240))
+                    self.change_resolution((320,240))
                 if event.key == pygame.K_e:
-                    self.chage_resolution((640,480))
+                    self.change_resolution((640,480))
                 if event.key == pygame.K_f:
-                    self.chage_resolution(None)
+                    self.fullscreen = not self.fullscreen
+                    if self.fullscreen:
+                        self.change_resolution(None)
+                    else:
+                        self.change_resolution((800,600))
                 if event.key == pygame.K_w:
                     self.zoom_factor +=1
-                    self.chage_resolution(self.screen_size)
+                    if self.zoom_factor >10:
+                        self.zoom_factor = 10
+                    self.change_display_size()
                 if event.key == pygame.K_s:
                     self.zoom_factor -= 1
-                    self.chage_resolution(self.screen_size)
+                    if self.zoom_factor <1:
+                        self.zoom_factor = 1
+                    self.change_display_size()
                         
                 if event.key == pygame.K_SPACE:
                     self.player.jump = True
@@ -98,10 +111,9 @@ class Game:
     
     def draw(self):
         self.display.fill((0,200,200))
-        offset = self.camera.get_camera_offset()
-        self.tilemap.render(self.display, offset)
-        
-
+       
+        self.tilemap.render(self.display, self.camera.get_camera_offset())
+       
         self.player.render(self.display, self.camera.get_camera_offset())
                     
         self.screen.blit(pygame.transform.scale(self.display, (self.screen.width, self.screen.height)))
@@ -110,5 +122,4 @@ class Game:
     def resize():
         pass
     
-Game(800, 600, 6).run()    
-    
+Game(800, 600, 6).run()
