@@ -3,13 +3,13 @@ from script.helpers import load_image, load_images, load_assets
 from script.entities import Player
 from script.tilemap import Tilemap
 from script.camera import Camera
-class Game:
+class Editor:
     def __init__(self, width:int = 1280, height:int = 960, zoom = 2):
         pygame.init()
         self.screen_size = list((width, height))
         self.zoom_factor = zoom
         self.display_center = None
-        pygame.display.set_caption('Review game')
+        pygame.display.set_caption('Review Editor' + str(self.screen_size))
         self.display:pygame.display.Surface = None
         self.fullscreen = False
         self.timer = pygame.time.Clock()
@@ -34,6 +34,7 @@ class Game:
         self.display = pygame.surface.Surface((int(self.screen_size[0]//self.zoom_factor), int(self.screen_size[1]/self.zoom_factor)))
         
         self.camera = Camera(self.player.get_center_pos(), self.display_center)
+        pygame.display.set_caption('Review Editor' + str(self.screen_size) +"; "+str(self.zoom_factor))
         
     def change_resolution(self, size):
         if not size:
@@ -43,6 +44,7 @@ class Game:
             self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
         self.change_display_size()
+        
 
     def run(self):
         while self.running:
@@ -120,4 +122,4 @@ class Game:
         pygame.display.flip()
         
     
-Game(640, 480, 3).run()
+Editor(800, 600, 2).run()
