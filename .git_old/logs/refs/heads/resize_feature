@@ -1,0 +1,6 @@
+0000000000000000000000000000000000000000 4f2f23d2059a2a1a84af17ceb6f4b60641ee09b5 martinfrnka <martin.frnka@gmail.com> 1775947344 +0200	branch: Created from HEAD
+4f2f23d2059a2a1a84af17ceb6f4b60641ee09b5 e8c1fe16ad1483aedfd3d74183a878c9ce8b7926 martinfrnka <martin.frnka@gmail.com> 1775947471 +0200	commit: added resize function skeleton
+e8c1fe16ad1483aedfd3d74183a878c9ce8b7926 f0709044546f59ac861a6b56c6da8211b8f87ad1 martinfrnka <martin.frnka@gmail.com> 1775947639 +0200	commit: commit
+f0709044546f59ac861a6b56c6da8211b8f87ad1 97aa5748c4edb9388c8ca64acfdfc819e19915fe martinfrnka <martin.frnka@gmail.com> 1776141578 +0200	commit: added change_resolution functionalitx w/ fullscreen
+97aa5748c4edb9388c8ca64acfdfc819e19915fe 83673c0148095a6b67a4255233f77858a52d74b8 martinfrnka <martin.frnka@gmail.com> 1776179321 +0200	commit: reworked resize screen to the function change_resolution(). Used also when initialising game.
+83673c0148095a6b67a4255233f77858a52d74b8 2a9c7d86cda986709bc935de51e3917644c90c45 martinfrnka <martin.frnka@gmail.com> 1776202561 +0200	commit: added zoom change

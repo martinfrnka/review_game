@@ -2,6 +2,7 @@ import os
 import pygame
 
 BASE_IMG_PATH = 'data/images/'
+BASE_MAP_PATH = 'data/maps/'
 
 def load_image(relative_path:str):
     return pygame.image.load(BASE_IMG_PATH+relative_path).convert()
@@ -24,3 +25,8 @@ def load_assets():
             'clouds': load_images('clouds/'),
             
         }
+
+def load_map(filename:str):
+        with open(BASE_MAP_PATH + filename, 'r') as mapfile:
+            print(mapfile.readlines())
+            
