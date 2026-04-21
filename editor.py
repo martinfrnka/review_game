@@ -1,8 +1,9 @@
-import pygame
-from script.helpers import load_image, load_images, load_assets
-from script.entities import Player
+test commitimport pygame
+
+from script.helpers import load_assets, load_map
 from script.tilemap import Tilemap
 from script.camera import Camera
+
 class Editor:
     def __init__(self, width:int = 1280, height:int = 960, zoom = 2):
         pygame.init()
@@ -15,25 +16,33 @@ class Editor:
         self.timer = pygame.time.Clock()
         self.running = True
 
-        self.camera:Camera = None
+        self.camera_movement = [False, False, False, False]
+        self.camera_desired_center_position = list((0,0))
+        self.camera:Camera = Camera((0,0), (0,0), self.zoom_factor)
 
         self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         
         self.assets = load_assets()
+        self.maps = load_map('0.json')
         
-        self.player = Player(self.assets['player'], (105,55), 3)
-
         self.change_resolution((width, height))
         self.tilemap = Tilemap(self.assets)
-        print('Game initialised!')
+        
+        print('Editor initialised!')
         
     def change_display_size(self):
         self.screen_size = self.screen.get_size()
         self.display_center = ((self.screen_size[0]/2)/self.zoom_factor, (self.screen_size[1]/2)/self.zoom_factor)
         
-        self.display = pygame.surface.Surface((int(self.screen_size[0]//self.zoom_factor), int(self.screen_size[1]/self.zoom_factor)))
+        camerazoom = self.camera.get_camera_zoom()
         
-        self.camera = Camera(self.player.get_center_pos(), self.display_center)
+        if self.zoom_factor != camerazoom:
+           pass
+        
+        self.display = pygame.surface.Surface((int(self.screen_size[0]//camerazoom), int(self.screen_size[1]/camerazoom)))
+        
+        
+        self.camera = Camera(self.camera_desired_center_position, self.display_center)
         pygame.display.set_caption('Review Editor' + str(self.screen_size) +"; "+str(self.zoom_factor))
         
     def change_resolution(self, size):
@@ -44,7 +53,11 @@ class Editor:
             self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
         self.change_display_size()
-        
+
+    def update_camera_desired_position(self, speed):
+        self.camera_desired_center_position[0] += (self.camera_movement[3] - self.camera_movement[2])*speed
+        self.camera_desired_center_position[1] += (self.camera_movement[1] - self.camera_movement[0])*speed
+
 
     def run(self):
         while self.running:
@@ -64,13 +77,13 @@ class Editor:
                 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    self.player.movement[0] = True
+                    self.camera_movement[0] = True
                 if event.key == pygame.K_DOWN:
-                    self.player.movement[1] = True
+                    self.camera_movement[1] = True
                 if event.key == pygame.K_LEFT:
-                    self.player.movement[2] = True
+                    self.camera_movement[2] = True
                 if event.key == pygame.K_RIGHT:
-                    self.player.movement[3] = True
+                    self.camera_movement[3] = True
                 if event.key == pygame.K_r:
                     self.change_resolution((320,240))
                 if event.key == pygame.K_e:
@@ -92,22 +105,20 @@ class Editor:
                         self.zoom_factor = 1
                     self.change_display_size()
                         
-                if event.key == pygame.K_SPACE:
-                    self.player.jump = True
  
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
-                    self.player.movement[0] = False
+                    self.camera_movement[0] = False
                 if event.key == pygame.K_DOWN:
-                    self.player.movement[1] = False
+                    self.camera_movement[1] = False
                 if event.key == pygame.K_LEFT:
-                    self.player.movement[2] = False
-                if event.key == pygame.K_RIGHT:
-                    self.player.movement[3] = False
+                    self.camera_movement[2] = False
+                if event.key ==pygame.K_RIGHT:
+                    self.camera_movement[3] = False
     
     def update(self):
-        self.player.update()
-        self.camera.update(self.player.get_center_pos())
+        self.update_camera_desired_position(5)
+        self.camera.update(self.camera_desired_center_position)
        
         self.tilemap.update()
     
@@ -115,9 +126,7 @@ class Editor:
         self.display.fill((0,200,200))
        
         self.tilemap.render(self.display, self.camera.get_camera_offset())
-       
-        self.player.render(self.display, self.camera.get_camera_offset())
-                    
+                          
         self.screen.blit(pygame.transform.scale(self.display, (self.screen.width, self.screen.height)))
         pygame.display.flip()
         
