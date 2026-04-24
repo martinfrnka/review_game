@@ -28,5 +28,6 @@ def load_assets():
 
 def load_map(filename:str):
         with open(BASE_MAP_PATH + filename, 'r') as mapfile:
-            print(mapfile.readlines())
+            pass
+            #print(mapfile.readlines())
             
