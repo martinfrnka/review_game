@@ -70,6 +70,7 @@ class Camera2:
         self.center_offset[0] += (movement[3] - movement[2])*speed/30
         self.center_offset[1] += (movement[1] - movement[0])*speed/30
         
+        #TODO: podmínku vymyslet tak, aby se skončilo, když display bude změněn o 1px (něco jako target_size)
         if self.zoom_factor != self.current_zoom_factor:
             if abs(self.current_zoom_factor - self.zoom_factor) > 0.001:
                 self.current_zoom_factor += (self.zoom_factor - self.current_zoom_factor)/30
