@@ -2,7 +2,7 @@ import pygame
 
 from script.helpers import load_assets, load_map
 from script.tilemap import Tilemap
-from script.camera import Camera, Camera2
+from script.camera import Camera
 
 class Editor:
     def __init__(self, width:int = 1280, height:int = 960, zoom = 2):
@@ -10,55 +10,36 @@ class Editor:
         self.screen_size = list((width, height))
         self.display_center = None
         pygame.display.set_caption('Review Editor' + str(self.screen_size))
-        self.display:pygame.display.Surface = None
         self.fullscreen = False
         self.timer = pygame.time.Clock()
         self.running = True
 
         self.camera_movement = [False, False, False, False]
         self.camera_desired_center_position = list((0,0))
-        self.zoom_factor:float = zoom
-        self.camera:Camera = Camera((0,0), (0,0), self.zoom_factor)
-        self.camera2 = Camera2((self.screen_size), self.zoom_factor, 5)
 
-        self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
-        
+        self.camera:Camera = Camera((self.screen_size), zoom, 2)
+        self.display = pygame.surface.Surface(self.camera.get_display_size())
+
+        # self.screen = pygame.display.set_mode(self.screen_size, pygame.RESIZABLE)
+        self.screen: pygame.Surface = None        
+        self.change_resolution()
+
         self.assets = load_assets()
-        self.maps = load_map('0.json')
-        
-        self.change_resolution((width, height))
+        self.maps = load_map('0.json')        
+
         self.tilemap = Tilemap(self.assets)
         
         print('Editor initialised!')
-        
-    def change_display_size(self):
-        self.screen_size = self.screen.get_size()
-        camerazoom = self.camera.get_camera_zoom()
-        self.display_center = ((self.screen_size[0]/2)/self.zoom_factor, (self.screen_size[1]/2)/self.zoom_factor)
-        
-        
-        self.display = pygame.surface.Surface((int(self.screen_size[0]/camerazoom), int(self.screen_size[1]/camerazoom)))
-        
-        
-        self.camera = Camera(self.camera_desired_center_position, self.display_center, self.zoom_factor)
-        pygame.display.set_caption('Review Editor' + str(self.screen_size) +"; "+str(self.zoom_factor))
-        
-    def change_resolution(self, size):
-        if not size:
+                
+    def change_resolution(self):
+        if self.fullscreen:
             print('go full')
             self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         else:
-            self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
+            self.screen = pygame.display.set_mode(self.screen_size)
         
-        self.camera2.screen_size_changed((self.screen.get_width(), self.screen.get_height()))    
-
-        self.change_display_size()
-
-    def update_camera_desired_position(self, speed):
-        self.camera_desired_center_position[0] += (self.camera_movement[3] - self.camera_movement[2])*speed
-        self.camera_desired_center_position[1] += (self.camera_movement[1] - self.camera_movement[0])*speed
-
-
+        self.camera.screen_size_changed((self.screen.get_width(), self.screen.get_height()))    
+        pygame.display.set_caption('Review Editor' + str(self.screen_size) +"; "+str(self.camera.zoom_factor))
 
     def run(self):
         while self.running:
@@ -74,7 +55,7 @@ class Editor:
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 self.running = False
             if event.type == pygame.VIDEORESIZE:
-                self.change_resolution((event.w, event.h))
+                self.change_resolution()
                 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
@@ -86,25 +67,22 @@ class Editor:
                 if event.key == pygame.K_RIGHT:
                     self.camera_movement[3] = True
                 if event.key == pygame.K_r:
-                    self.change_resolution((320,240))
+                    self.screen_size = ((320,200))
+                    self.change_resolution()
                 if event.key == pygame.K_e:
-                    self.change_resolution((640,480))
+                    self.screen_size = ((640, 480))
+                    self.change_resolution()
                 if event.key == pygame.K_f:
                     self.fullscreen = not self.fullscreen
-                    if self.fullscreen:
-                        self.change_resolution(None)
-                    else:
-                        self.change_resolution((800,600))
+                    self.change_resolution()
                 if event.key == pygame.K_w:
-                    self.zoom_factor +=1
-                    if self.zoom_factor >10:
-                        self.zoom_factor = 10
-                    self.change_display_size()
+                    self.camera.camera_zoom_up()
                 if event.key == pygame.K_s:
-                    self.zoom_factor -= 1
-                    if self.zoom_factor <1:
-                        self.zoom_factor = 1
-                    self.change_display_size()
+                    self.camera.camera_zoom_down()
+                if event.key == pygame.K_q:
+                    self.camera.speed_up()
+                if event.key == pygame.K_a:
+                    self.camera.speed_down()
                         
  
             if event.type == pygame.KEYUP:
@@ -118,9 +96,12 @@ class Editor:
                     self.camera_movement[3] = False
     
     def update(self):
-        self.update_camera_desired_position(5)
-        self.camera.update(self.camera_desired_center_position, self.zoom_factor, 4)
-       
+        
+        self.camera.update(self.camera_movement)
+        
+        if self.display.get_size() != self.camera.get_display_size():
+            self.display = pygame.surface.Surface(self.camera.get_display_size())
+        
         self.tilemap.update()
     
     def draw(self):
@@ -132,4 +113,4 @@ class Editor:
         pygame.display.flip()
         
     
-Editor(800, 600, 2).run()
+Editor(800, 600).run()
