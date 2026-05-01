@@ -6,6 +6,9 @@ from script.camera import Camera
 
 class Editor:
     def __init__(self, width:int = 1280, height:int = 960, zoom = 2):
+        self.current_tile = 0
+        self.current_variant = 0
+        
         pygame.init()
         self.screen_size = list((width, height))
         self.display_center = None
@@ -15,12 +18,10 @@ class Editor:
         self.running = True
 
         self.camera_movement = [False, False, False, False]
-        self.camera_desired_center_position = list((0,0))
 
         self.camera:Camera = Camera((self.screen_size), zoom, 2)
         self.display = pygame.surface.Surface(self.camera.get_display_size())
 
-        # self.screen = pygame.display.set_mode(self.screen_size, pygame.RESIZABLE)
         self.screen: pygame.Surface = None        
         self.change_resolution()
 
@@ -52,12 +53,15 @@ class Editor:
         
     def handle_events(self):
         for event in pygame.event.get():
+            #quit when ESC is pressed or window is closed
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 self.running = False
             if event.type == pygame.VIDEORESIZE:
                 self.change_resolution()
-                
+            
+            #key is pressed
             if event.type == pygame.KEYDOWN:
+                #movement of camera, arrows
                 if event.key == pygame.K_UP:
                     self.camera_movement[0] = True
                 if event.key == pygame.K_DOWN:
@@ -66,6 +70,8 @@ class Editor:
                     self.camera_movement[2] = True
                 if event.key == pygame.K_RIGHT:
                     self.camera_movement[3] = True
+                
+                #r,e,f - resolution change, w,s - zoom, q,a - speed of camera
                 if event.key == pygame.K_r:
                     self.screen_size = ((320,200))
                     self.change_resolution()
@@ -84,7 +90,7 @@ class Editor:
                 if event.key == pygame.K_a:
                     self.camera.speed_down()
                         
- 
+            #release of keys
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
                     self.camera_movement[0] = False
