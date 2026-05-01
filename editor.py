@@ -8,7 +8,8 @@ class Editor:
     def __init__(self, width:int = 1280, height:int = 960, zoom = 2):
         self.current_tile = 0
         self.current_variant = 0
-        
+        self.shift = False
+                
         pygame.init()
         self.screen_size = list((width, height))
         self.display_center = None
@@ -26,6 +27,8 @@ class Editor:
         self.change_resolution()
 
         self.assets = load_assets()
+        self.asset_keys = list(self.assets.keys())
+        
         self.maps = load_map('0.json')        
 
         self.tilemap = Tilemap(self.assets)
@@ -89,6 +92,10 @@ class Editor:
                     self.camera.speed_up()
                 if event.key == pygame.K_a:
                     self.camera.speed_down()
+                    
+                #shift key down
+                if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
+                    self.shift = True
                         
             #release of keys
             if event.type == pygame.KEYUP:
@@ -100,6 +107,35 @@ class Editor:
                     self.camera_movement[2] = False
                 if event.key ==pygame.K_RIGHT:
                     self.camera_movement[3] = False
+                #shift key up
+                if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
+                    self.shift = False
+                    
+            #mouse events
+            if event.type == pygame.MOUSEWHEEL:
+                if event.y > 0:
+                    self.current_tile_change(+1)
+                if event.y < 0:
+                    self.current_tile_change(-1)
+    
+    def current_tile_change(self, change):
+        if self.shift:
+            self.current_variant = (self.current_variant + change) % len(self.assets[self.asset_keys[self.current_tile]])
+        else:
+            self.current_tile = (self.current_tile + change) % len(self.asset_keys)
+            self.current_variant = 0
+            
+        print(f'Current tile: {self.current_tile}, current variant: {self.current_variant}')
+    
+    def draw_current_tile(self):
+        current_tile_key = self.asset_keys[self.current_tile]
+        current_tile_image = self.assets[current_tile_key]
+        if type(current_tile_image) == dict:
+            current_tile_image = current_tile_image[list(current_tile_image.keys())[self.current_variant]]
+        
+        #display selected tile and variant 
+        self.display.blit(current_tile_image, (10,10))
+        pygame.draw.rect(self.display, (255,0,0), (10,10,current_tile_image.get_width(), current_tile_image.get_height()), 1)
     
     def update(self):
         
@@ -114,6 +150,8 @@ class Editor:
         self.display.fill((0,200,200))
        
         self.tilemap.render(self.display, self.camera.get_camera_offset())
+        
+        self.draw_current_tile()
                           
         self.screen.blit(pygame.transform.scale(self.display, (self.screen.width, self.screen.height)))
         pygame.display.flip()
