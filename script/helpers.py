@@ -14,7 +14,7 @@ def load_images(relative_folder_path:str):
         images[filename] = load_image(relative_folder_path + filename)
     return images
 
-def load_assets():
+def load_all_assets():
     return {
             'player': (load_image('player.png')),
             'decor': load_images('tiles/decor/'),
@@ -24,6 +24,14 @@ def load_assets():
             'spawners': load_images('tiles/spawners/'),
             'clouds': load_images('clouds/'),
             
+        }
+def load_tilemap_assets():
+    return {
+            'decor': load_images('tiles/decor/'),
+            'large_decor': load_images('tiles/large_decor/'),
+            'grass': load_images('tiles/grass/'),
+            'stone': load_images('tiles/stone/'),
+            #;'spawners': load_images('tiles/spawners/'),
         }
 
 def load_map(filename:str):

@@ -1,6 +1,6 @@
 import pygame
 
-from script.helpers import load_assets, load_map
+from script.helpers import load_map, load_tilemap_assets
 from script.tilemap import Tilemap
 from script.camera import Camera
 
@@ -26,7 +26,7 @@ class Editor:
         self.screen: pygame.Surface = None        
         self.change_resolution()
 
-        self.assets = load_assets()
+        self.assets = load_tilemap_assets()
         self.asset_keys = list(self.assets.keys())
         
         self.maps = load_map('0.json')        
